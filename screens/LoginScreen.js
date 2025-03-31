@@ -1,18 +1,40 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../redux/slices/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WrapInput from '../component/WrapInput';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
+import { auth } from '../Firestore/firebaseConfig';
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+
+WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isValidEmail, setIsValidEmail] = useState(false);
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState(false);
-  const dispatch = useDispatch();
+
+  // Google Auth
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    clientId: '170843770861-d3gfhadfl1n3c7rb41m6qkka8v98gnlv.apps.googleusercontent.com',
+    androidClientId: '170843770861-pb0vummgjp0qc9sf3s2n4uo2mtr0uf78.apps.googleusercontent.com',
+    redirectUri: 'https://auth.expo.io/@phuckaido2k5/ASM1',
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      const credential = GoogleAuthProvider.credential(id_token);
+      handleGoogleSignIn(credential);
+    }
+  }, [response]);
 
   // Kiểm tra định dạng email
   const validateEmail = (text) => {
@@ -21,21 +43,51 @@ const LoginScreen = ({ navigation }) => {
     setIsValidEmail(emailRegex.test(text)); // True nếu đúng định dạng
   };
 
-  // Xử lý đăng nhập
+  // Xử lý đăng nhập thường
   const handleLogin = async () => {
-    const storedUser = await AsyncStorage.getItem('user');
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    if (storedUser) {
-      const { email: savedEmail, password: savedPassword } = JSON.parse(storedUser);
+      const userData = {
+        uid: user.uid,
+        email: user.email,
+        name: user.displayName || '', // Firebase có thể không lưu name
+        phone: user.phoneNumber || '',
+      };
 
-      if (email === savedEmail && password === savedPassword) {
-        dispatch(loginSuccess(email));
-        navigation.replace('Home');
-      } else {
-        setError(true);
-      }
-    } else {
-      alert('Không tìm thấy tài khoản, vui lòng đăng ký.');
+      await AsyncStorage.setItem('user', JSON.stringify(userData));
+      dispatch(loginSuccess(userData));
+
+      Alert.alert('Thành công', 'Đăng nhập thành công!');
+      navigation.replace('Home');
+    } catch (error) {
+      console.error('Lỗi đăng nhập:', error);
+      Alert.alert('Lỗi', 'Sai email hoặc mật khẩu.');
+    }
+  };
+
+  // Xử lý đăng nhập Google
+  const handleGoogleSignIn = async (credential) => {
+    try {
+      const userCredential = await signInWithCredential(auth, credential);
+      const user = userCredential.user;
+
+      const userData = {
+        uid: user.uid,
+        name: user.displayName,
+        email: user.email,
+        phone: user.phoneNumber || '',
+      };
+
+      await AsyncStorage.setItem('user', JSON.stringify(userData));
+      dispatch(loginSuccess(userData));
+
+      Alert.alert('Thành công', 'Đăng nhập bằng Google thành công!');
+      navigation.replace('Home');
+    } catch (error) {
+      console.error('Google Sign-In Error:', error);
+      Alert.alert('Lỗi', 'Đăng nhập Google thất bại.');
     }
   };
 
@@ -93,15 +145,11 @@ const LoginScreen = ({ navigation }) => {
       {/* Hoặc */}
       <Text style={styles.orText}>Hoặc</Text>
 
-      {/* Nút Đăng nhập Google & Facebook */}
-      <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Ionicons name="logo-google" size={24} color="red" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Ionicons name="logo-facebook" size={24} color="blue" />
-        </TouchableOpacity>
-      </View>
+      {/* Nút Đăng nhập Google */}
+      <TouchableOpacity style={styles.googleButton} onPress={() => promptAsync()}>
+        <Ionicons name="logo-google" size={24} color="white" />
+        <Text style={styles.googleText}>Đăng nhập với Google</Text>
+      </TouchableOpacity>
 
       {/* Tạo tài khoản */}
       <View style={styles.signupContainer}>
@@ -172,27 +220,19 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     color: 'gray',
   },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  socialButton: {
-    marginHorizontal: 10,
-    padding: 10,
-    backgroundColor: '#f2f2f2',
-    borderRadius: 50,
-  },
-  signupContainer: {
-    flexDirection: 'row',
+  googleButton: {
+    backgroundColor: '#DB4437',
+    padding: 12,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
     marginTop: 10,
   },
-  signupText: {
-    color: 'gray',
-  },
-  signupLink: {
-    color: 'green',
+  googleText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
-  },
+  }
 });
 
 export default LoginScreen;
