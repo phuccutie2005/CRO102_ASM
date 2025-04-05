@@ -24,7 +24,7 @@ const LoginScreen = ({ navigation }) => {
   // Google Auth
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     clientId: '170843770861-d3gfhadfl1n3c7rb41m6qkka8v98gnlv.apps.googleusercontent.com',
-    androidClientId: '170843770861-pb0vummgjp0qc9sf3s2n4uo2mtr0uf78.apps.googleusercontent.com',
+    androidClientId: '170843770861-i13pc447m28mti4lcp3mq5uevdt9mvtf.apps.googleusercontent.com',
     redirectUri: 'https://auth.expo.io/@phuckaido2k5/ASM1',
   });
 
