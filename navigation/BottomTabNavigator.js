@@ -12,25 +12,25 @@ const Tab = createBottomTabNavigator();
 export default function BottomTabNavigator() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen 
-        name="Products" 
-        component={ProductsScreen} 
-        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="pricetag" size={size} color={color} /> }} 
+      <Tab.Screen
+        name="Trang chủ"
+        component={ProductsScreen}
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} /> }}
       />
-      <Tab.Screen 
-        name="Orders" 
-        component={OrdersScreen} 
-        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="cart" size={size} color={color} /> }} 
+      <Tab.Screen
+        name="Orders"
+        component={OrdersScreen}
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="cart" size={size} color={color} /> }}
       />
-      <Tab.Screen 
-        name="Customers" 
-        component={CustomersScreen} 
-        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="people" size={size} color={color} /> }} 
+      <Tab.Screen
+        name="Customers"
+        component={CustomersScreen}
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="people" size={size} color={color} /> }}
       />
-      <Tab.Screen 
-        name="Profile" 
-        component={ProfileScreen} 
-        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} /> }} 
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} /> }}
       />
     </Tab.Navigator>
   );

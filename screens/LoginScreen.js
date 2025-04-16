@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   },
   googleButton: {
     backgroundColor: '#DB4437',
-    padding: 12,
+    padding: 5,
     borderRadius: 8,
     width: '100%',
     alignItems: 'center',
