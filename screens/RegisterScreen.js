@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ScrollView, } from 'react-native';
 import { auth, db } from '../Firestore/firebaseConfig';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -9,6 +9,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { useNavigation } from '@react-navigation/native';
+import CustomBackHeader from '../component/header';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -37,7 +38,6 @@ const RegisterScreen = () => {
     }
   }, [response]);
 
-  // Lưu dữ liệu vào AsyncStorage
   const saveUserToLocal = async (userData) => {
     try {
       await AsyncStorage.setItem('user', JSON.stringify(userData));
@@ -46,21 +46,18 @@ const RegisterScreen = () => {
     }
   };
 
-  // Kiểm tra định dạng email
   const validateEmail = (text) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     setEmail(text);
     setIsValidEmail(emailRegex.test(text));
   };
 
-  // Kiểm tra số điện thoại (bắt đầu bằng 0 và có đúng 10 số)
   const validatePhone = (text) => {
     const phoneRegex = /^0\d{9}$/;
     setPhone(text);
     setIsValidPhone(phoneRegex.test(text));
   };
 
-  // Kiểm tra mật khẩu trùng khớp
   const validatePasswordMatch = (text) => {
     setConfirmPassword(text);
     setIsMatchPassword(text === password);
@@ -81,15 +78,13 @@ const RegisterScreen = () => {
       const user = userCredential.user;
 
       const userData = { uid: user.uid, name, email, phone, createdAt: new Date() };
-
-      // Lưu vào Firestore
       await setDoc(doc(db, 'users', user.uid), userData);
-
-      // Lưu vào AsyncStorage
+      console.log("🔥 User đã được ghi vào Firestore:", userData);
       await saveUserToLocal(userData);
-
       Alert.alert('Thành công', 'Đăng ký thành công!');
-      navigation.navigate('Home');
+      setTimeout(() => {
+        navigation.replace('Login'); // hoặc navigate
+      }, 300); // chờ 300ms để Alert hiển thị xong
     } catch (error) {
       console.error('Firebase Error:', error.code, error.message);
       Alert.alert('Lỗi đăng ký', `Mã lỗi: ${error.code}\n${error.message}`);
@@ -103,20 +98,17 @@ const RegisterScreen = () => {
 
       const userData = {
         uid: user.uid,
-        name: user.displayName,
-        email: user.email,
-        phone: user.phoneNumber || '',
-        createdAt: new Date(),
+        name,
+        email,
+        phone,
+        createdAt: serverTimestamp() // <-- đổi từ new Date() sang cái này
       };
 
-      // Lưu vào Firestore
       await setDoc(doc(db, 'users', user.uid), userData, { merge: true });
-
-      // Lưu vào AsyncStorage
       await saveUserToLocal(userData);
 
       Alert.alert('Thành công', 'Đăng nhập bằng Google thành công!');
-      navigation.navigate('Home');
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Google Sign-In Error:', error.code, error.message);
       Alert.alert('Lỗi đăng nhập', `Mã lỗi: ${error.code}\n${error.message}`);
@@ -124,38 +116,142 @@ const RegisterScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={require('../assets/nahida.png')} style={styles.headerImage} />
-      <Text style={styles.title}>Đăng ký</Text>
-      <Text style={styles.subtitle}>Tạo tài khoản</Text>
+    <>
+      <CustomBackHeader navigation={navigation} />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <Image source={require('../assets/nahida.png')} style={styles.headerImage} />
 
-      <WrapInput placeholder="Họ tên" value={name} onChangeText={setName} />
-      <WrapInput placeholder="E-mail" value={email} onChangeText={validateEmail} keyboardType="email-address" isError={!isValidEmail && email.length > 0} errorMessage="Email không hợp lệ!" />
-      <WrapInput placeholder="Số điện thoại" value={phone} onChangeText={validatePhone} keyboardType="phone-pad" isError={!isValidPhone && phone.length > 0} errorMessage="SĐT phải có 10 số!" />
-      <WrapInput placeholder="Mật khẩu" value={password} onChangeText={setPassword} secureTextEntry />
-      <WrapInput placeholder="Xác nhận mật khẩu" value={confirmPassword} onChangeText={validatePasswordMatch} secureTextEntry isError={!isMatchPassword && confirmPassword.length > 0} errorMessage="Mật khẩu không trùng khớp!" />
+          <Text style={styles.title}>Đăng ký</Text>
+          <Text style={styles.subtitle}>Tạo tài khoản</Text>
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Đăng ký</Text>
-      </TouchableOpacity>
+          <WrapInput placeholder="Họ tên" value={name} onChangeText={setName} />
+          <WrapInput
+            placeholder="E-mail"
+            value={email}
+            onChangeText={validateEmail}
+            keyboardType="email-address"
+            isError={!isValidEmail && email.length > 0}
+            errorMessage="Email không hợp lệ!"
+          />
+          <WrapInput
+            placeholder="Số điện thoại"
+            value={phone}
+            onChangeText={validatePhone}
+            keyboardType="phone-pad"
+            isError={!isValidPhone && phone.length > 0}
+            errorMessage="SĐT phải có 10 số!"
+          />
+          <WrapInput
+            placeholder="Mật khẩu"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <WrapInput
+            placeholder="Xác nhận mật khẩu"
+            value={confirmPassword}
+            onChangeText={validatePasswordMatch}
+            secureTextEntry
+            isError={!isMatchPassword && confirmPassword.length > 0}
+            errorMessage="Mật khẩu không trùng khớp!"
+          />
 
-      <Text style={styles.orText}>Hoặc</Text>
+          <Text style={styles.termsText}>
+            Để đăng ký tài khoản, bạn đồng ý{' '}
+            <Text style={styles.link}>Terms & Conditions</Text> và{' '}
+            <Text style={styles.link}>Privacy Policy</Text>
+          </Text>
 
-      <TouchableOpacity style={styles.googleButton} onPress={() => promptAsync()}>
-        <Ionicons name="logo-google" size={24} color="white" />
-        <Text style={styles.googleText}>Đăng nhập với Google</Text>
-      </TouchableOpacity>
-    </View>
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Đăng ký</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.orText}>────────  Hoặc  ────────</Text>
+
+          <TouchableOpacity style={styles.googleButton} onPress={() => promptAsync()}>
+            <Ionicons name="logo-google" size={24} color="white" />
+            <Text style={styles.googleText}>Đăng nhập với Google</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', padding: 20, backgroundColor: 'white' },
-  headerImage: { width: '100%', height: 120, resizeMode: 'cover', borderBottomLeftRadius: 30 },
-  title: { fontSize: 26, fontWeight: 'bold', marginTop: 20 },
-  subtitle: { fontSize: 16, color: 'gray', marginBottom: 20 },
-  button: { backgroundColor: '#28A745', padding: 12, borderRadius: 8, width: '100%', alignItems: 'center', marginTop: 10 },
-  buttonText: { color: 'white', fontSize: 16, fontWeight: 'bold' }
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  container: {
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  headerImage: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'cover',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1C1C1C',
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: '#6e6e6e',
+    marginBottom: 20,
+  },
+  termsText: {
+    fontSize: 12,
+    color: '#555',
+    marginTop: 6,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  link: {
+    color: '#2e8b57',
+    fontWeight: 'bold',
+  },
+  button: {
+    backgroundColor: '#28A745',
+    paddingVertical: 14,
+    borderRadius: 12,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  orText: {
+    marginVertical: 14,
+    color: '#888',
+    fontSize: 14,
+  },
+  googleButton: {
+    flexDirection: 'row',
+    backgroundColor: '#EA4335',
+    paddingVertical: 12,
+    borderRadius: 12,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  googleText: {
+    color: 'white',
+    fontSize: 15,
+    fontWeight: '500',
+    marginLeft: 8,
+  },
 });
 
 export default RegisterScreen;

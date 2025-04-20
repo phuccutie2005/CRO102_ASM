@@ -3,9 +3,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 import ProductsScreen from '../screens/ProductsScreen';
-import OrdersScreen from '../screens/OrdersScreen';
 import CustomersScreen from '../screens/CustomersScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import SearchScreen from '../screens/SeacrhScreen';
+import CartScreen from '../screens/CartScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,14 +19,19 @@ export default function BottomTabNavigator() {
         options={{ tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} /> }}
       />
       <Tab.Screen
-        name="Orders"
-        component={OrdersScreen}
+        name="Tìm kiếm"
+        component={SearchScreen}
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="search-outline" size={size} color={color} /> }}
+      />
+      <Tab.Screen
+        name="Giỏ hàng"
+        component={CartScreen}
         options={{ tabBarIcon: ({ color, size }) => <Ionicons name="cart" size={size} color={color} /> }}
       />
       <Tab.Screen
-        name="Customers"
+        name="Thông báo"
         component={CustomersScreen}
-        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="people" size={size} color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" size={size} color={color} /> }}
       />
       <Tab.Screen
         name="Profile"

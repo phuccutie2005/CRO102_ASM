@@ -4,6 +4,11 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import BottomTabNavigator from './BottomTabNavigator';
 import DetailProductScreen from '../screens/DetailsProductScreen';
+import PaymentScreen from '../screens/PaymentScreen';
+import EditProfileScreen from '../screens/EditProfile';
+import OrderHistory from '../screens/OrderHistory';
+
+
 
 const Stack = createStackNavigator();
 
@@ -14,6 +19,10 @@ export default function StackNavigator() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Home" component={BottomTabNavigator} />
       <Stack.Screen name="DetailProduct" component={DetailProductScreen} />
+      <Stack.Screen name="Payment" component={PaymentScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="OrderHistory" component={OrderHistory} options={{ headerShown: false }} />
     </Stack.Navigator>
+
   );
 }

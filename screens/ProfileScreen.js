@@ -19,7 +19,7 @@ const ProfileScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>PROFILE</Text>
+
 
       <View style={styles.profileSection}>
         <Image
@@ -35,9 +35,13 @@ const ProfileScreen = () => {
       {/* các mục khác giữ nguyên */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Chung</Text>
-        <TouchableOpacity style={styles.item}><Text style={styles.itemText}>Chỉnh sửa thông tin</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('EditProfile')}>
+          <Text style={styles.itemText}>Chỉnh sửa thông tin</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.item}><Text style={styles.itemText}>Cẩm nang trồng cây</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.item}><Text style={styles.itemText}>Lịch sử giao dịch</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('OrderHistory')}>
+          <Text style={styles.itemText}>Lịch sử giao dịch</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.item}><Text style={styles.itemText}>Q & A</Text></TouchableOpacity>
       </View>
 

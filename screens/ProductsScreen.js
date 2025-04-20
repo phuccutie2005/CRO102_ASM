@@ -9,15 +9,17 @@ import {
   ScrollView,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { setProducts } from '../redux/slices/productsSlice';
+import { setProducts, setPots } from '../redux/slices/productsSlice';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-
 const ProductsScreen = () => {
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.products.products);
   const navigation = useNavigation();
+
+  const products = useSelector((state) => state.products.products);
+  const pots = useSelector((state) => state.products.pots); // ✅ THÊM selector cho pots
+
   useEffect(() => {
     const fakeProducts = [
       {
@@ -50,14 +52,35 @@ const ProductsScreen = () => {
       },
     ];
     dispatch(setProducts(fakeProducts));
+
+    const fakePots = [
+      {
+        id: 5,
+        name: 'Planta Trắng',
+        price: '250.000đ',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf3C0svMJgXXFgKyWqFuR_rpgUfg1rM9xM3A&s',
+      },
+      {
+        id: 6,
+        name: 'Planta Lemon Balm',
+        price: '250.000đ',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmdwq_u8u41k1NHvAWhXuWZn3P5ONmp9jsAg&s',
+      },
+      {
+        id: 7,
+        name: 'Planta Rosewood',
+        price: '250.000đ',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSE3AL3pxlhgPbBzocFAnJmhfZFb1kdRjGGMQ&s',
+      },
+      {
+        id: 8,
+        name: 'Planta Dove Grey',
+        price: '250.000đ',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzMkV1X_e6tJuAkl6f6eOyERWmMNPchgmW6A&s',
+      },
+    ];
+    dispatch(setPots(fakePots));
   }, []);
-  // Fake data
-  const pots = [
-    { id: 1, name: 'Planta Trắng', price: '250.000đ', image: 'https://hips.hearstapps.com/hmg-prod/images/blooming-white-flowers-spathiphyllum-royalty-free-image-1722883454.jpg?crop=0.51912xw:1xh;center,top&resize=980:*' },
-    { id: 2, name: 'Planta Lemon Balm', price: '250.000đ', image: 'https://bizweb.dktcdn.net/100/392/499/products/lemon-balm-mint-bh-chanh-sa.jpg?v=1594111891147' },
-    { id: 3, name: 'Planta Rosewood', price: '250.000đ', image: 'https://sudospaces.com/thichtrongcay/2020/10/small-plant-palm-rosewood-pot-4.jpg' },
-    { id: 4, name: 'Planta Dove Grey', price: '250.000đ', image: 'https://vinapot.vn/wp-content/uploads/2024/11/IMG_6180-300x300.jpg' },
-  ];
 
   const comboCare = {
     name: 'Lemon Balm Grow Kit',
@@ -66,10 +89,14 @@ const ProductsScreen = () => {
     image: 'https://i.ytimg.com/vi/m5pQ8ulRCXY/maxresdefault.jpg',
   };
 
-  const renderItemBasic = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate('DetailProduct', { product: item })}
+    >
       <Image source={{ uri: item.image }} style={styles.image} />
       <Text style={styles.name}>{item.name}</Text>
+      {item.light && <Text style={styles.light}>{item.light}</Text>}
       <Text style={styles.price}>{item.price}</Text>
     </TouchableOpacity>
   );
@@ -85,27 +112,17 @@ const ProductsScreen = () => {
         </TouchableOpacity>
       </View>
       <Image
-        source={{ uri: 'https://growhoss.com/cdn/shop/files/AdobeStock_562373165.jpg?v=1697046068' }} // ảnh cây trang trí banner
+        source={{ uri: 'https://growhoss.com/cdn/shop/files/AdobeStock_562373165.jpg?v=1697046068' }}
         style={styles.bannerImage}
         resizeMode="contain"
       />
     </View>
   );
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => navigation.navigate('DetailProduct', { product: item })}
-    >
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.light}>{item.light}</Text>
-      <Text style={styles.price}>{item.price}</Text>
-    </TouchableOpacity>
-  );
   return (
     <ScrollView style={styles.container}>
       {renderBanner()}
+
       <Text style={styles.sectionTitle}>Cây trồng</Text>
       <FlatList
         data={products}
@@ -113,17 +130,19 @@ const ProductsScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.grid}
-        scrollEnabled={false} // vì đang trong ScrollView
+        scrollEnabled={false}
       />
+
       <Text style={styles.sectionTitle}>Chậu cây trồng</Text>
       <FlatList
         data={pots}
         numColumns={2}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItemBasic}
+        renderItem={renderItem}
         contentContainerStyle={styles.grid}
         scrollEnabled={false}
       />
+
       <Text style={styles.sectionTitle}>Combo chăm sóc (mới)</Text>
       <View style={[styles.card, { flexDirection: 'row', alignItems: 'center' }]}>
         <Image source={{ uri: comboCare.image }} style={{ width: 80, height: 80, borderRadius: 10, marginRight: 10 }} />
