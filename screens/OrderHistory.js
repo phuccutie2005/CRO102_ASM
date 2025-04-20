@@ -1,73 +1,87 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
-const orders = [
-    {
-        date: 'Thứ tư, 03/09/2021',
-        items: [
-            {
-                status: 'Đặt hàng thành công',
-                statusColor: 'green',
-                name: 'Spider Plant',
-                description: '1 chậu lớn',
-                quantity: '2 sản phẩm',
-                image: 'https://cdn.shopify.com/s/files/1/0150/6262/products/plant_1024x1024.jpg?v=1490389682'
-            }
-        ]
-    },
-    {
-        date: 'Thứ hai, 01/09/2021',
-        items: [
-            {
-                status: 'Đã huỷ đơn hàng',
-                statusColor: 'red',
-                name: 'Spider Plant',
-                description: '1 chậu lớn',
-                quantity: '3 sản phẩm',
-                image: 'https://cdn.shopify.com/s/files/1/0150/6262/products/plant_1024x1024.jpg?v=1490389682'
-            }
-        ]
-    }
-];
+import CustomBackHeader from '../component/header';
+import { useNavigation } from '@react-navigation/native';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../Firestore/firebaseConfig'; // thay bằng đường dẫn đúng của bạn
+import { getAuth } from 'firebase/auth';
 
 const OrderHistoryScreen = () => {
+    const navigation = useNavigation();
+    const [orders, setOrders] = useState([]);
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const q = query(collection(db, 'notifications'), where('userId', '==', user.uid));
+                const querySnapshot = await getDocs(q);
+
+                const groupedOrders = {};
+
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.date;
+                    if (!groupedOrders[date]) groupedOrders[date] = [];
+                    groupedOrders[date].push({ id: doc.id, ...data });
+                });
+
+                const formattedOrders = Object.keys(groupedOrders).map(date => ({
+                    date,
+                    items: groupedOrders[date]
+                }));
+
+                setOrders(formattedOrders);
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        };
+
+        if (user) fetchOrders();
+    }, []);
+
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Ionicons name="chevron-back" size={24} color="black" />
-                <Text style={styles.headerTitle}>LỊCH SỬ GIAO DỊCH</Text>
+        <>
+            <CustomBackHeader navigation={navigation} />
+            <View style={styles.container}>
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    {orders.map((order, index) => (
+                        <View key={index}>
+                            <Text style={styles.date}>{order.date}</Text>
+                            {order.items.map((item, idx) => (
+                                <TouchableOpacity
+                                    key={idx}
+                                    style={styles.itemContainer}
+                                    onPress={() => navigation.navigate('NoticationOrder', { ...item })}
+                                >
+                                    <Image source={{ uri: item.image }} style={styles.image} />
+                                    <View style={styles.details}>
+                                        <Text style={[styles.status, { color: 'green' }]}>{item.title}</Text>
+                                        <Text style={styles.name}>
+                                            {item.productName} | <Text style={styles.desc}>{item.description}</Text>
+                                        </Text>
+                                        <Text style={styles.quantity}>Số lượng: {item.quantity}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    ))}
+                </ScrollView>
             </View>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                {orders.map((order, index) => (
-                    <View key={index}>
-                        <Text style={styles.date}>{order.date}</Text>
-                        {order.items.map((item, idx) => (
-                            <View key={idx} style={styles.itemContainer}>
-                                <Image source={{ uri: item.image }} style={styles.image} />
-                                <View style={styles.details}>
-                                    <Text style={[styles.status, { color: item.statusColor }]}>{item.status}</Text>
-                                    <Text style={styles.name}>
-                                        {item.name} | <Text style={styles.desc}>{item.description}</Text>
-                                    </Text>
-                                    <Text style={styles.quantity}>{item.quantity}</Text>
-                                </View>
-                            </View>
-                        ))}
-                    </View>
-                ))}
-            </ScrollView>
-        </View>
+        </>
     );
 };
 
 export default OrderHistoryScreen;
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: 50
+        paddingTop: 1
     },
     header: {
         flexDirection: 'row',

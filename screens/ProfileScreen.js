@@ -38,11 +38,15 @@ const ProfileScreen = () => {
         <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('EditProfile')}>
           <Text style={styles.itemText}>Chỉnh sửa thông tin</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.item}><Text style={styles.itemText}>Cẩm nang trồng cây</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('GardeningHandbook')}>
+          <Text style={styles.itemText}>Cẩm nang trồng cây</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('OrderHistory')}>
           <Text style={styles.itemText}>Lịch sử giao dịch</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.item}><Text style={styles.itemText}>Q & A</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('QAQuestion')}>
+          <Text style={styles.itemText}>Q&A</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>

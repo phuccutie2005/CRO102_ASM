@@ -7,8 +7,11 @@ import DetailProductScreen from '../screens/DetailsProductScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import EditProfileScreen from '../screens/EditProfile';
 import OrderHistory from '../screens/OrderHistory';
-
-
+import NoticationOrder from '../screens/NotificationOrder';
+import GardeningHandbook from '../screens/GardeningHandbook';
+import QAQuestion from '../screens/QAQuestion';
+import MoreProductScreen from '../screens/MoreProduct';
+import MorePotScreen from '../screens/MorePotProduct';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +25,11 @@ export default function StackNavigator() {
       <Stack.Screen name="Payment" component={PaymentScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
       <Stack.Screen name="OrderHistory" component={OrderHistory} options={{ headerShown: false }} />
+      <Stack.Screen name="NoticationOrder" component={NoticationOrder} options={{ headerShown: false }} />
+      <Stack.Screen name="GardeningHandbook" component={GardeningHandbook} options={{ headerShown: false }} />
+      <Stack.Screen name="QAQuestion" component={QAQuestion} options={{ headerShown: false }} />
+      <Stack.Screen name="MoreProductScreen" component={MoreProductScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="MorePotScreen" component={MorePotScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
 
   );

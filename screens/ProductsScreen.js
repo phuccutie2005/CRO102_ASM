@@ -58,25 +58,25 @@ const ProductsScreen = () => {
         id: 5,
         name: 'Planta Trắng',
         price: '250.000đ',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf3C0svMJgXXFgKyWqFuR_rpgUfg1rM9xM3A&s',
+        image: 'https://media.loveitopcdn.com/23464/chau-trong-cay-bang-xi-mang-xuat-xuong.jpg',
       },
       {
         id: 6,
         name: 'Planta Lemon Balm',
         price: '250.000đ',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmdwq_u8u41k1NHvAWhXuWZn3P5ONmp9jsAg&s',
+        image: 'https://cmtgarden.com/wp-content/uploads/2019/06/kim-tien-chau-vuong-xi-mang-1.jpg',
       },
       {
         id: 7,
         name: 'Planta Rosewood',
         price: '250.000đ',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSE3AL3pxlhgPbBzocFAnJmhfZFb1kdRjGGMQ&s',
+        image: 'https://cayxanhphonghong.com/img_data/images/cach-chon-chau-trong-cay.jpg',
       },
       {
         id: 8,
         name: 'Planta Dove Grey',
         price: '250.000đ',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzMkV1X_e6tJuAkl6f6eOyERWmMNPchgmW6A&s',
+        image: 'https://hoasenviet.net/uploads/photos/1688089492_2908_846709f8b3df9fa3b9f88735e81d806c.jpg',
       },
     ];
     dispatch(setPots(fakePots));
@@ -132,6 +132,12 @@ const ProductsScreen = () => {
         contentContainerStyle={styles.grid}
         scrollEnabled={false}
       />
+      <TouchableOpacity
+        style={{ alignItems: 'center', marginBottom: 10 }}
+        onPress={() => navigation.navigate('MoreProductScreen')}
+      >
+        <Text style={{ color: '#27ae60', fontWeight: '600' }}>Xem thêm cây trồng</Text>
+      </TouchableOpacity>
 
       <Text style={styles.sectionTitle}>Chậu cây trồng</Text>
       <FlatList
@@ -142,6 +148,12 @@ const ProductsScreen = () => {
         contentContainerStyle={styles.grid}
         scrollEnabled={false}
       />
+      <TouchableOpacity
+        style={{ alignItems: 'center', marginBottom: 10 }}
+        onPress={() => navigation.navigate('MorePotScreen')}
+      >
+        <Text style={{ color: '#27ae60', fontWeight: '600' }}>Xem thêm chậu cây</Text>
+      </TouchableOpacity>
 
       <Text style={styles.sectionTitle}>Combo chăm sóc (mới)</Text>
       <View style={[styles.card, { flexDirection: 'row', alignItems: 'center' }]}>
