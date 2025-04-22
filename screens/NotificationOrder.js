@@ -16,7 +16,7 @@ const NoticationOrder = ({ navigation, route }) => {
         shipping,
         payment,
         total,
-        productName,
+        product,
         quantity,
         image,
         title,
@@ -36,7 +36,7 @@ const NoticationOrder = ({ navigation, route }) => {
 
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Thông tin khách hàng</Text>
-                        <Text>{productName ?? 'Sản phẩm không xác định'} x {quantity ?? 1}</Text>
+                        <Text>{name ?? 'Sản phẩm không xác định'}</Text>
                         <Text>{email ?? 'Chưa cung cấp email'}</Text>
                         <Text>{address ?? 'Không có địa chỉ'}</Text>
                         <Text>{phone ?? 'Không có số điện thoại'}</Text>
@@ -54,7 +54,7 @@ const NoticationOrder = ({ navigation, route }) => {
 
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Đơn hàng đã chọn</Text>
-                        <Text>{productName ?? 'Không có tên sản phẩm'} x {quantity}</Text>
+                        <Text>{product?.name ?? 'Không có tên sản phẩm'} x {quantity}</Text>
                     </View>
 
                     <View style={styles.footer}>

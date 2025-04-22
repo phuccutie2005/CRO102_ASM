@@ -101,7 +101,7 @@ const RegisterScreen = () => {
         name,
         email,
         phone,
-        createdAt: serverTimestamp() // <-- đổi từ new Date() sang cái này
+        createdAt: serverTimestamp()
       };
 
       await setDoc(doc(db, 'users', user.uid), userData, { merge: true });
@@ -120,7 +120,7 @@ const RegisterScreen = () => {
       <CustomBackHeader navigation={navigation} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
-          <Image source={require('../assets/nahida.png')} style={styles.headerImage} />
+          <Image source={require('../assets/xanh.jpg')} style={styles.headerImage} />
 
           <Text style={styles.title}>Đăng ký</Text>
           <Text style={styles.subtitle}>Tạo tài khoản</Text>
@@ -165,13 +165,6 @@ const RegisterScreen = () => {
 
           <TouchableOpacity style={styles.button} onPress={handleRegister}>
             <Text style={styles.buttonText}>Đăng ký</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.orText}>────────  Hoặc  ────────</Text>
-
-          <TouchableOpacity style={styles.googleButton} onPress={() => promptAsync()}>
-            <Ionicons name="logo-google" size={24} color="white" />
-            <Text style={styles.googleText}>Đăng nhập với Google</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

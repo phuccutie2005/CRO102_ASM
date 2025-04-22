@@ -27,7 +27,6 @@ const ProfileScreen = () => {
           style={styles.avatar}
         />
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>{user?.name || 'Chưa đăng nhập'}</Text>
           <Text style={styles.userEmail}>{user?.email || '---'}</Text>
         </View>
       </View>

@@ -12,12 +12,13 @@ import GardeningHandbook from '../screens/GardeningHandbook';
 import QAQuestion from '../screens/QAQuestion';
 import MoreProductScreen from '../screens/MoreProduct';
 import MorePotScreen from '../screens/MorePotProduct';
-
+import SplashScreen from '../Splash/SplashScreen';
 const Stack = createStackNavigator();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+    <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Home" component={BottomTabNavigator} />
@@ -30,6 +31,7 @@ export default function StackNavigator() {
       <Stack.Screen name="QAQuestion" component={QAQuestion} options={{ headerShown: false }} />
       <Stack.Screen name="MoreProductScreen" component={MoreProductScreen} options={{ headerShown: false }} />
       <Stack.Screen name="MorePotScreen" component={MorePotScreen} options={{ headerShown: false }} />
+
     </Stack.Navigator>
 
   );

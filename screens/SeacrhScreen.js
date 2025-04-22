@@ -83,7 +83,7 @@ const SearchScreen = () => {
             {filteredProducts.length > 0 ? (
                 <FlatList
                     data={filteredProducts}
-                    keyExtractor={(item) => item.id.toString()}  // Đảm bảo key là duy nhất
+                    keyExtractor={(item) => item.id.toString()}
                     renderItem={renderProductItem}
                 />
 

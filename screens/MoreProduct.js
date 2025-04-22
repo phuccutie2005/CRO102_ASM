@@ -84,10 +84,7 @@ const MoreProductScreen = () => {
         <>
             <CustomBackHeader navigation={navigation} />
             <View style={styles.container}>
-                {/* Header */}
 
-
-                {/* Tabs */}
                 <View style={styles.tabContainer}>
                     {tabs.map((tab) => (
                         <TouchableOpacity
@@ -110,7 +107,7 @@ const MoreProductScreen = () => {
                     ))}
                 </View>
 
-                {/* Product List */}
+
                 <FlatList
                     data={filteredProducts}
                     keyExtractor={(item) => item.id.toString()}

@@ -100,7 +100,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={require('../assets/nahida.png')} style={styles.headerImage} imageStyle={{ borderBottomLeftRadius: 50, borderBottomRightRadius: 50 }} />
+      <ImageBackground source={require('../assets/xanh.jpg')} style={styles.headerImage} imageStyle={{ borderBottomLeftRadius: 50, borderBottomRightRadius: 50 }} />
       <Text style={styles.title}>Chào mừng bạn</Text>
       <Text style={styles.subtitle}>Đăng nhập tài khoản</Text>
 

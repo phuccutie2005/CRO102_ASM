@@ -8,12 +8,13 @@ import {
     Image,
     ScrollView,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { db } from '../Firestore/firebaseConfig'; // Sửa lại đường dẫn theo dự án của bạn
+import { db } from '../Firestore/firebaseConfig';
 import { getAuth } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';  // Các hàm Firestore
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import CustomBackHeader from '../component/header';
 import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const EditProfileScreen = () => {
     const navigation = useNavigation();
@@ -21,9 +22,50 @@ const EditProfileScreen = () => {
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
     const [phone, setPhone] = useState('');
+    const [avatar, setAvatar] = useState(null);
 
     const auth = getAuth();
     const user = auth.currentUser;
+    const storage = getStorage();
+
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const pickImage = async () => {
+        if (isProcessing) return; // Nếu đang xử lý, không làm gì
+        setIsProcessing(true); // Đánh dấu là đang xử lý
+
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (permissionResult.granted === false) {
+            alert("Bạn cần cho phép truy cập thư viện ảnh!");
+            setIsProcessing(false); // Xử lý xong, cho phép lại
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.7,
+        });
+
+        if (!result.canceled) {
+            const selectedAsset = result.assets[0];
+            if (selectedAsset?.uri) {
+                const response = await fetch(selectedAsset.uri);
+                const blob = await response.blob();
+
+                const avatarRef = ref(storage, `avatars/${user.uid}.jpg`);
+                await uploadBytes(avatarRef, blob);
+
+                const downloadURL = await getDownloadURL(avatarRef);
+                setAvatar(downloadURL);
+            }
+        }
+
+        setIsProcessing(false); // Xử lý xong, cho phép lại
+    };
+
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -37,6 +79,7 @@ const EditProfileScreen = () => {
                         setEmail(user.email || '');
                         setAddress(data.address || '');
                         setPhone(data.phone || '');
+                        setAvatar(data.avatar || null);
                     }
                 } catch (error) {
                     console.error('Lỗi khi lấy dữ liệu người dùng:', error);
@@ -50,14 +93,14 @@ const EditProfileScreen = () => {
     const handleSave = async () => {
         try {
             if (user) {
-                const userDoc = doc(db, 'users', user.uid); // Lưu vào document của người dùng
+                const userDoc = doc(db, 'users', user.uid);
                 await setDoc(userDoc, {
                     name,
                     email,
                     address,
                     phone,
+                    avatar,
                 });
-
                 alert('Thông tin đã được lưu!');
             }
         } catch (error) {
@@ -70,12 +113,12 @@ const EditProfileScreen = () => {
         <ScrollView style={styles.container}>
             <CustomBackHeader navigation={navigation} />
 
-            <View style={styles.imageContainer}>
+            <TouchableOpacity style={styles.imageContainer} onPress={pickImage}>
                 <Image
-                    source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Checkerboard_pattern.svg/2048px-Checkerboard_pattern.svg.png' }}
-                    style={styles.image}
+                    source={avatar ? { uri: avatar } : require('../assets/icon.png')}
+                    style={styles.avatar}
                 />
-            </View>
+            </TouchableOpacity>
 
             <Text style={styles.infoNote}>
                 <Text style={{ color: '#2ecc71' }}>Thông tin đã được lưu cho lần mua kế tiếp.</Text>{'\n'}
@@ -95,7 +138,7 @@ const EditProfileScreen = () => {
                     onChangeText={setEmail}
                     keyboardType="email-address"
                     placeholder="Email"
-                    editable={false} // Email không cho phép chỉnh sửa
+                    editable={false}
                 />
                 <TextInput
                     style={styles.input}
@@ -124,26 +167,16 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 20,
-        paddingBottom: 10,
-    },
-    headerTitle: {
-        marginLeft: 10,
-        fontSize: 16,
-        fontWeight: 'bold',
+    avatar: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        resizeMode: 'cover',
     },
     imageContainer: {
         alignItems: 'center',
         marginTop: 10,
         marginBottom: 10,
-    },
-    image: {
-        width: 60,
-        height: 60,
-        resizeMode: 'contain',
     },
     infoNote: {
         textAlign: 'center',

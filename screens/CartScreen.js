@@ -19,8 +19,8 @@ export default function CartScreen({ navigation }) {
         try {
             const cartData = JSON.parse(await AsyncStorage.getItem('cart')) || [];
             setCartItems(cartData);
-            setTotalPrice(0);
-            setSelectedItems([]);
+            setSelectedItems([]); // Reset lựa chọn khi tải lại
+            updateTotalPrice([]); // Reset tổng giá trị hoặc tính toán lại dựa trên sản phẩm đã chọn
         } catch (error) {
             console.error('Lỗi tải giỏ hàng:', error);
         }
@@ -29,7 +29,7 @@ export default function CartScreen({ navigation }) {
     const updateTotalPrice = (selectedIds) => {
         const total = cartItems
             .filter(item => selectedIds.includes(item.id))
-            .reduce((sum, item) => sum + item.price * item.quantity, 0);
+            .reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
         setTotalPrice(total);
     };
@@ -49,17 +49,19 @@ export default function CartScreen({ navigation }) {
         const updatedCart = cartItems.map(item => {
             if (item.id === id) {
                 let newQuantity = action === 'increase' ? item.quantity + 1 : item.quantity - 1;
-                if (newQuantity > 0) {
+                if (newQuantity > 0 && newQuantity !== item.quantity) {
                     return { ...item, quantity: newQuantity };
                 }
-                return null;
             }
             return item;
         }).filter(Boolean);
 
-        await AsyncStorage.setItem('cart', JSON.stringify(updatedCart));
-        setCartItems(updatedCart);
-        updateTotalPrice(selectedItems);
+        if (JSON.stringify(updatedCart) !== JSON.stringify(cartItems)) {
+            await AsyncStorage.setItem('cart', JSON.stringify(updatedCart));
+            setCartItems(updatedCart);
+            setSelectedItems([]);  // Reset lựa chọn khi có thay đổi
+            updateTotalPrice([]);   // Cập nhật lại tổng tiền khi thay đổi giỏ hàng
+        }
     };
 
     const removeSelectedItems = async () => {
@@ -99,8 +101,14 @@ export default function CartScreen({ navigation }) {
         }
 
         const selectedProducts = cartItems.filter(item => selectedItems.includes(item.id));
-        navigation.navigate('Checkout', { cartItems: selectedProducts, totalPrice });
+        updateTotalPrice(selectedItems);  // Cập nhật lại totalPrice trước khi chuyển trang
+        navigation.navigate('Payment', {
+            product: selectedProducts,
+            quantity: selectedProducts.map(p => p.quantity),
+            totalPrice
+        });
     };
+
 
     return (
         <View style={styles.container}>

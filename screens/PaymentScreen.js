@@ -12,7 +12,7 @@ const PaymentScreen = ({ route, navigation }) => {
 
     const auth = getAuth();
     const user = auth.currentUser;
-    const { product, quantity, totalPrice } = route.params;
+    const { product, quantity, totalPrice, cartItems } = route.params;
 
     const [shippingMethod, setShippingMethod] = useState('fast');
     const [paymentMethod, setPaymentMethod] = useState('visa');
@@ -179,19 +179,22 @@ const PaymentScreen = ({ route, navigation }) => {
                             // Lưu thông báo vào Firestore
                             await addDoc(collection(db, 'notifications'), {
                                 userId: user.uid,
-                                name,
-                                email,
+                                name: fullName,
+                                email: user.email,
                                 address,
                                 phone,
-                                shipping,
-                                payment,
-                                total,
+                                shipping: shippingMethod === 'fast'
+                                    ? 'Giao hàng Nhanh - 15.000đ\n(Dự kiến giao hàng 5-7/9)'
+                                    : 'Giao hàng COD - 20.000đ\n(Dự kiến giao hàng 4-8/9)',
+                                payment:
+                                    paymentMethod === 'visa' ? 'Thẻ VISA/MASTERCARD' :
+                                        paymentMethod === 'atm' ? 'Thẻ ATM' : 'Thanh toán khi nhận hàng',
+                                total: totalCost.toLocaleString() + 'đ',
                                 productName: product.name,
                                 image: product.image,
-                                description: product.description,
                                 quantity,
                                 title: 'Đặt hàng thành công',
-                                date: new Date().toLocaleDateString('vi-VN'), // ví dụ: 21/04/2025
+                                date: new Date().toLocaleDateString('vi-VN'),
                             });
 
 
